@@ -1,0 +1,19 @@
+[project]
+name = "stack-compare-ai"
+version = "0.1.0"
+description = "AI-powered technology stack recommendations"
+authors = [
+    {name = "StackCompare Team", email = "team@stackcompare.com"}
+]
+dependencies = [
+    "fastapi>=0.104.1",
+    "uvicorn>=0.24.0",
+    "pydantic>=2.5.0",
+    "mistralai>=0.0.12",
+    "python-dotenv>=1.0.0",
+]
+requires-python = ">=3.11"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
