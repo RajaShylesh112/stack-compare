@@ -1,0 +1,37 @@
+[
+  {
+    "name": "React",
+    "githubUrl": "https://github.com/facebook/react",
+    "language": "JavaScript",
+    "tags": ["frontend", "ui", "component"],
+    "description": "A JavaScript library for building user interfaces"
+  },
+  {
+    "name": "Vue.js",
+    "githubUrl": "https://github.com/vuejs/vue",
+    "language": "JavaScript",
+    "tags": ["frontend", "progressive", "framework"],
+    "description": "Progressive JavaScript framework for building UI"
+  },
+  {
+    "name": "Django",
+    "githubUrl": "https://github.com/django/django",
+    "language": "Python",
+    "tags": ["backend", "web", "framework"],
+    "description": "High-level Python web framework"
+  },
+  {
+    "name": "Spring Boot",
+    "githubUrl": "https://github.com/spring-projects/spring-boot",
+    "language": "Java",
+    "tags": ["backend", "enterprise", "microservices"],
+    "description": "Spring Boot makes it easy to create production-ready applications"
+  },
+  {
+    "name": "Flutter",
+    "githubUrl": "https://github.com/flutter/flutter",
+    "language": "Dart",
+    "tags": ["mobile", "cross-platform", "ui"],
+    "description": "Google's UI toolkit for building natively compiled applications"
+  }
+]
