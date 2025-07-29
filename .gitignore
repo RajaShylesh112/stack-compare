@@ -8,3 +8,11 @@ vite.config.ts.*
 *.pid
 package-lock.json
 .vscode/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.staging
+server/.env
+appwrite/functions/*/.env
