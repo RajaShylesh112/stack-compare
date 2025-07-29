@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import { Client, Storage, ID, Databases, Query } from "node-appwrite";
 import dotenv from 'dotenv';
 
