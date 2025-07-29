@@ -2,7 +2,7 @@
   "name": "github-fetcher",
   "type": "module",
   "dependencies": {
-    "dotenv": "^16.3.1",
-    "node-appwrite": "^14.0.0"
+    "dotenv": "^17.2.1",
+    "node-appwrite": "^17.2.0"
   }
 }
