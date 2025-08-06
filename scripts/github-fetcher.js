@@ -363,10 +363,10 @@ async function main() {
   ];
 
   // Init Appwrite Storage and Database (before processing repositories)
-  const client = new Client()
-    .setEndpoint(APPWRITE_ENDPOINT)
-    .setProject(APPWRITE_PROJECT)
-    .setKey(APPWRITE_API_KEY);
+  const client = new Client();
+  client.setEndpoint(APPWRITE_ENDPOINT);
+  client.setProject(APPWRITE_PROJECT);
+  client.setKey(APPWRITE_API_KEY);
 
   const storage = new Storage(client);
   const databases = new Databases(client);
