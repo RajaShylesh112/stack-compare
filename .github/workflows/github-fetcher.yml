@@ -1,7 +1,9 @@
 name: GitHub Fetcher
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   fetch-data:
