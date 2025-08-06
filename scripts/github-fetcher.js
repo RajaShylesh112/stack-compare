@@ -277,6 +277,11 @@ async function saveRepositoryToDatabase(databases, repoData, stackMeta, qualityA
 }
 
 async function main() {
+  console.log("ENV:", {
+    APPWRITE_ENDPOINT: process.env.APPWRITE_ENDPOINT,
+    APPWRITE_PROJECT: process.env.APPWRITE_PROJECT,
+    APPWRITE_API_KEY: process.env.APPWRITE_API_KEY,
+  });
   try {
     // Validate environment variables
     if (!GITHUB_TOKEN) {
