@@ -1,16 +1,16 @@
-import bcrypt from 'bcrypt';
-import { db } from '../database';
+import { db } from '../database/connection';
 import { users } from '../database/schema';
 import { eq } from 'drizzle-orm';
 import { AppError } from '../middleware/errorHandler';
+import * as bcrypt from 'bcryptjs';
 
 // This represents the user data returned to the client (password excluded)
 export interface UserPublic {
-  id: number;
+  id: string;
   email: string;
   username: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | null;
+  updatedAt: Date | null;
 }
 
 export interface LoginCredentials {
@@ -55,15 +55,19 @@ export class AuthService {
 
       const user = result[0];
 
-      const isValidPassword = await bcrypt.compare(password, user.password);
+      const isValidPassword = await bcrypt.compare(password, user.passwordHash);
       
       if (!isValidPassword) {
         throw new AppError('Invalid credentials or user not found', 401);
       }
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password: _, ...userWithoutPassword } = user;
-      return userWithoutPassword;
+      const { passwordHash, ...userWithoutPassword } = user;
+      return {
+        ...userWithoutPassword,
+        id: user.id,
+        username: user.username || '', // Ensure username is not null
+      };
 
     } catch (error) {
       if (error instanceof AppError) {
@@ -77,7 +81,7 @@ export class AuthService {
   /**
    * Get user by ID
    */
-  public async getUserById(id: number): Promise<UserPublic | null> {
+  public async getUserById(id: string): Promise<UserPublic | null> {
     try {
       const result = await db.select({
         id: users.id,
@@ -128,7 +132,7 @@ export class AuthService {
       // Create user
       const newUser = {
         email: email.toLowerCase().trim(),
-        password: hashedPassword,
+        passwordHash: hashedPassword,
         username,
       };
 

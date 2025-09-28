@@ -1,41 +1,39 @@
 // src/repositories/technology.repository.ts
-import { db } from '../config/database';
+import { db } from '../database/connection';
+import { technologyStacks } from '../database/schema';
+import { eq } from 'drizzle-orm';
 import { IBaseRepository } from './base.repository';
 
-// This type is a placeholder. We will define it properly
-// once we have the Drizzle ORM schema set up.
-export type Technology = {
-  id: number;
-  name: string;
-  category: string;
-  description: string;
-  // ... other fields from the 'technologies' table
-};
+// The Technology type is inferred from the Drizzle schema
+export type Technology = typeof technologyStacks.$inferSelect;
+export type NewTechnology = typeof technologyStacks.$inferInsert;
 
 class TechnologyRepository implements IBaseRepository<Technology> {
   async findAll(): Promise<Technology[]> {
-    const result = await db.query('SELECT * FROM technologies');
-    return result.rows;
+    return await db.select().from(technologyStacks);
   }
 
-  async findById(id: number): Promise<Technology | null> {
-    const result = await db.query('SELECT * FROM technologies WHERE id = $1', [id]);
-    return result.rows[0] || null;
+  async findById(id: string): Promise<Technology | null> {
+    const result = await db.select().from(technologyStacks).where(eq(technologyStacks.id, id));
+    return result[0] || null;
   }
 
-  async create(data: Omit<Technology, 'id'>): Promise<Technology> {
-    // Implementation will depend on the final schema and Drizzle setup
-    throw new Error('Method not implemented.');
+  async create(data: NewTechnology): Promise<Technology> {
+    const result = await db.insert(technologyStacks).values(data).returning();
+    return result[0];
   }
 
-  async update(id: number, data: Partial<Omit<Technology, 'id'>>): Promise<Technology | null> {
-    // Implementation will depend on the final schema and Drizzle setup
-    throw new Error('Method not implemented.');
+  async update(id: string, data: Partial<NewTechnology>): Promise<Technology | null> {
+    const result = await db.update(technologyStacks)
+      .set(data)
+      .where(eq(technologyStacks.id, id))
+      .returning();
+    return result[0] || null;
   }
 
-  async delete(id: number): Promise<boolean> {
-    // Implementation will depend on the final schema and Drizzle setup
-    throw new Error('Method not implemented.');
+  async delete(id: string): Promise<boolean> {
+    const result = await db.delete(technologyStacks).where(eq(technologyStacks.id, id)).returning({ id: technologyStacks.id });
+    return result.length > 0;
   }
 }
 

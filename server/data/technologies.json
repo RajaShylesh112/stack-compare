@@ -1,0 +1,102 @@
+[
+  {
+    "name": "React",
+    "category": "ui-library",
+    "githubRepo": "facebook/react"
+  },
+  {
+    "name": "Angular",
+    "category": "meta-framework",
+    "githubRepo": "angular/angular"
+  },
+  {
+    "name": "Vue.js",
+    "category": "ui-library",
+    "githubRepo": "vuejs/core"
+  },
+  {
+    "name": "Svelte",
+    "category": "ui-library",
+    "githubRepo": "sveltejs/svelte"
+  },
+  {
+    "name": "Node.js",
+    "category": "runtime",
+    "githubRepo": "nodejs/node"
+  },
+  {
+    "name": "Express",
+    "category": "web-framework",
+    "githubRepo": "expressjs/express"
+  },
+  {
+    "name": "FastAPI",
+    "category": "web-framework",
+    "githubRepo": "tiangolo/fastapi"
+  },
+  {
+    "name": "Django",
+    "category": "web-framework",
+    "githubRepo": "django/django"
+  },
+  {
+    "name": "Ruby on Rails",
+    "category": "web-framework",
+    "githubRepo": "rails/rails"
+  },
+  {
+    "name": "Drizzle ORM",
+    "category": "orm",
+    "githubRepo": "drizzle-team/drizzle-orm"
+  },
+  {
+    "name": "Prisma",
+    "category": "orm",
+    "githubRepo": "prisma/prisma"
+  },
+  {
+    "name": "SQLAlchemy",
+    "category": "orm",
+    "githubRepo": "sqlalchemy/sqlalchemy"
+  },
+  {
+    "name": "Next.js",
+    "category": "meta-framework",
+    "githubRepo": "vercel/next.js"
+  },
+  {
+    "name": "Nuxt.js",
+    "category": "meta-framework",
+    "githubRepo": "nuxt/nuxt"
+  },
+  {
+    "name": "PostgreSQL",
+    "category": "database",
+    "githubRepo": "postgres/postgres"
+  },
+  {
+    "name": "MongoDB",
+    "category": "database",
+    "githubRepo": "mongodb/mongo"
+  },
+  {
+    "name": "Redis",
+    "category": "database",
+    "githubRepo": "redis/redis"
+  },
+  {
+    "name": "Docker",
+    "category": "devops",
+    "githubRepo": "moby/moby"
+  },
+  {
+    "name": "Kubernetes",
+    "category": "devops",
+    "githubRepo": "kubernetes/kubernetes"
+  },
+  {
+    "name": "Tailwind CSS",
+    "category": "css-framework",
+    "githubRepo": "tailwindlabs/tailwindcss"
+  }
+]

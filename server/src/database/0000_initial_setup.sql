@@ -1,13 +1,9 @@
 -- Initial database schema for StackCompare
 -- Created: 2025-09-27
-CREATE OR REPLACE TYPE uuid_table AS TABLE OF VARCHAR2(36);
-
--- Enable UUID extension (removed for Oracle compatibility)
--- CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create users table
 CREATE TABLE IF NOT EXISTS users (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     role VARCHAR(50) DEFAULT 'user' CHECK (role IN ('user', 'admin', 'premium')),
@@ -21,7 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Create refresh_tokens table for JWT token management
 CREATE TABLE IF NOT EXISTS refresh_tokens (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     token_hash VARCHAR(255) NOT NULL,
     expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -31,7 +27,7 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
 
 -- Create technology stacks table
 CREATE TABLE IF NOT EXISTS technology_stacks (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
     description TEXT,
     category VARCHAR(100),
@@ -50,7 +46,7 @@ CREATE TABLE IF NOT EXISTS technology_stacks (
 
 -- Create user_stacks table (many-to-many relationship)
 CREATE TABLE IF NOT EXISTS user_stacks (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     stack_id UUID NOT NULL REFERENCES technology_stacks(id) ON DELETE CASCADE,
     experience_level VARCHAR(50) CHECK (experience_level IN ('beginner', 'intermediate', 'advanced', 'expert')),
@@ -60,20 +56,20 @@ CREATE TABLE IF NOT EXISTS user_stacks (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     UNIQUE(user_id, stack_id)
 );
+
 -- Create stack_comparisons table
-CREATE TABLE stack_comparisons (
-    id VARCHAR2(36) PRIMARY KEY DEFAULT SYS_GUID(),
-    user_id VARCHAR2(36) REFERENCES users(id) ON DELETE SET NULL,
-    name VARCHAR2(255) NOT NULL,
-    description CLOB,
-    stack_ids uuid_table NOT NULL, -- Array of stack IDs being compared
-    comparison_criteria CLOB, -- Store comparison criteria as JSON
-    results CLOB, -- Store comparison results as JSON
-    is_public NUMBER(1) DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
-NESTED TABLE stack_ids STORE AS stack_ids_nt;
+CREATE TABLE IF NOT EXISTS stack_comparisons (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    stack_ids UUID[] NOT NULL, -- Array of stack IDs being compared
+    comparison_criteria JSONB, -- Store comparison criteria as JSON
+    results JSONB, -- Store comparison results as JSON
+    is_public BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
@@ -84,27 +80,23 @@ CREATE INDEX IF NOT EXISTS idx_technology_stacks_popularity ON technology_stacks
 CREATE INDEX IF NOT EXISTS idx_user_stacks_user_id ON user_stacks(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_stacks_stack_id ON user_stacks(stack_id);
 CREATE INDEX IF NOT EXISTS idx_stack_comparisons_user_id ON stack_comparisons(user_id);
-CREATE INDEX idx_stack_comparisons_public ON stack_comparisons(CASE WHEN is_public = 1 THEN is_public END);
+CREATE INDEX IF NOT EXISTS idx_stack_comparisons_public ON stack_comparisons(is_public) WHERE is_public = true;
 
--- Create updated_at triggers for Oracle
-CREATE OR REPLACE TRIGGER update_users_updated_at
-BEFORE UPDATE ON users
-FOR EACH ROW
+-- Create updated_at trigger function
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
 BEGIN
-    :new.updated_at := SYSTIMESTAMP;
+    NEW.updated_at = NOW();
+    RETURN NEW;
 END;
-/
-CREATE OR REPLACE TRIGGER update_technology_stacks_updated_at
-BEFORE UPDATE ON technology_stacks
-FOR EACH ROW
-BEGIN
-    :new.updated_at := SYSTIMESTAMP;
-END;
-/
-CREATE OR REPLACE TRIGGER update_stack_comparisons_updated_at
-BEFORE UPDATE ON stack_comparisons
-FOR EACH ROW
-BEGIN
-    :new.updated_at := SYSTIMESTAMP;
-END;
-/
+$$ language 'plpgsql';
+
+-- Apply updated_at triggers
+CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users 
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_technology_stacks_updated_at BEFORE UPDATE ON technology_stacks 
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_stack_comparisons_updated_at BEFORE UPDATE ON stack_comparisons 
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
