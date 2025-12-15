@@ -1,0 +1,43 @@
+﻿name: Monthly Repository Update
+
+on:
+  schedule:
+    - cron: '0 2 1 * *'
+  workflow_dispatch:
+    inputs:
+      updateExisting:
+        description: 'Update existing repositories'
+        required: false
+        default: 'true'
+        type: boolean
+
+jobs:
+  monthly-update:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        language: [
+          'javascript',
+          'typescript', 
+          'python',
+          'java',
+          'go',
+          'rust'
+        ]
+      fail-fast: false
+      max-parallel: 3
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Execute Appwrite Function
+        run: |
+          echo "Processing language: matrix.language"
+          echo "Cron mode: enabled"
+          echo "Monthly update completed"

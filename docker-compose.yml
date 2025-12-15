@@ -1,0 +1,53 @@
+# Docker Compose for Green Environment as per story-003
+version: '3.8'
+services:
+  nodejs-backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=3001
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - stackcompare-net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://nodejs-backend:3001
+      - NEXT_PUBLIC_AUTH_PROVIDER=dual
+      - NODE_ENV=production
+      - PORT=3000
+    depends_on:
+      - nodejs-backend
+    networks:
+      - stackcompare-net
+
+  redis-sessions:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - stackcompare-net
+
+volumes:
+  redis_data:
+
+networks:
+  stackcompare-net:
+    driver: bridge

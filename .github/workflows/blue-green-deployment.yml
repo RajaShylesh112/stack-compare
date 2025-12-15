@@ -1,0 +1,101 @@
+# .github/workflows/blue-green-deployment.yml
+name: Blue-Green Deployment
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment for manual trigger'
+        required: true
+        default: 'green'
+        type: choice
+        options:
+          - green
+          - blue
+
+jobs:
+  deploy-green:
+    runs-on: ubuntu-latest
+    environment: green # Define the environment for secrets
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./server
+          file: ./server/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/stackcompare-backend:latest
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/stackcompare-frontend:latest
+
+      - name: Deploy to Green Environment (e.g., Railway/Render)
+        run: |
+          echo "Deploying to Green Environment..."
+          # This step would typically involve using a CLI or API call
+          # to the hosting provider to deploy the new Docker images.
+          # For example, using the Railway CLI:
+          # railway up --service stackcompare-backend --image ${{ secrets.DOCKER_HUB_USERNAME }}/stackcompare-backend:latest
+          # railway up --service stackcompare-frontend --image ${{ secrets.DOCKER_HUB_USERNAME }}/stackcompare-frontend:latest
+          echo "Deployment script placeholder."
+
+      - name: Health Check Green Environment
+        run: |
+          echo "Waiting for Green environment to be healthy..."
+          # This script would poll the health check endpoint of the new deployment
+          # until it returns a 200 OK status.
+          # Example:
+          # until $(curl --output /dev/null --silent --head --fail ${{ secrets.GREEN_ENVIRONMENT_URL }}/health); do
+          #   printf '.'
+          #   sleep 5
+          # done
+          echo "Health check script placeholder."
+
+      - name: Gradual Traffic Switch
+        run: |
+          echo "Switching traffic to Green environment..."
+          # This script would interact with the load balancer/DNS provider (e.g., Cloudflare)
+          # to gradually shift traffic from the Blue to the Green environment.
+          # Example with Cloudflare API:
+          # curl -X PATCH "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/..." \
+          #   -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+          #   -H "Content-Type: application/json" \
+          #   --data '{"weight":10}' # Start with 10% traffic
+          echo "Traffic switch script placeholder."
+
+      - name: Monitor Performance
+        run: |
+          echo "Monitoring deployment for 5 minutes..."
+          # This script would query monitoring tools (e.g., Datadog, Prometheus)
+          # to check for error spikes or performance degradation.
+          # If thresholds are exceeded, it would exit with a non-zero code.
+          sleep 300
+          echo "Monitoring script placeholder."
+
+      - name: Rollback on Failure
+        if: failure()
+        run: |
+          echo "Deployment failed! Rolling back to Blue environment..."
+          # This script would immediately switch 100% of traffic back to the Blue environment.
+          # Example with Cloudflare API:
+          # curl -X PATCH "..." --data '{"weight":0}' # 0% traffic to Green
+          echo "Rollback script placeholder."
