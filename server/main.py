@@ -107,7 +107,3 @@ async def global_exception_handler(request: Request, exc: Exception):
         status_code=500,
         content={"error": "Internal server error", "detail": str(exc) if app.debug else "An error occurred"}
     )
-
-
-# Vercel serverless handler
-handler = app
