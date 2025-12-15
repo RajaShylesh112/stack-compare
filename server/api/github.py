@@ -1,3 +1,11 @@
+
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {"message": "FastAPI working on Vercel"}
 from fastapi import APIRouter, Depends, HTTPException
 from schemas.github import (
     RepoStatsRequest, RepoStatsResponse,

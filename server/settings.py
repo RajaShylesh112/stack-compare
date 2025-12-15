@@ -27,9 +27,9 @@ class Settings(BaseSettings):
     internal_api_key: SecretStr
     
     # Application config
-    enable_dev_mode: bool = False
+    enable_dev_mode: bool = False  # Default to False for production safety
     debug: bool = False
-    allowed_origins: str = "http://localhost:3000,http://localhost:3001"
+    allowed_origins: str = "*"  # Allow all origins by default (will be validated in main.py)
     
     class Config:
         env_file = ".env"
