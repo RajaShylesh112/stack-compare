@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from pydantic import BaseModel
 from middleware.internal_auth import verify_internal_key
-from middleware.user_auth import verify_user_token
 from lib.b2_client import get_b2_client
 from utils.file_utils import sanitize_filename
 
@@ -87,7 +86,7 @@ async def generate_presigned_upload(file_name: str, expires_in: int = 3600):
         raise HTTPException(status_code=500, detail="Failed to generate presigned URL")
 
 
-@router.get("/read", response_model=ReadResponse, dependencies=[Depends(verify_user_token)])
+@router.get("/read", response_model=ReadResponse, dependencies=[Depends(verify_internal_key)])
 async def get_signed_read_url(file_name: str, expires_in: int = 3600):
     """Return signed time-limited read URL"""
     try:

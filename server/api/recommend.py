@@ -4,12 +4,12 @@ from schemas.recommend import (
     RecommendationResponse,
     TechRecommendation
 )
-from middleware.user_auth import verify_user_token
+from middleware.internal_auth import verify_internal_key
 
 router = APIRouter()
 
 
-@router.post("", response_model=RecommendationResponse, dependencies=[Depends(verify_user_token)])
+@router.post("", response_model=RecommendationResponse, dependencies=[Depends(verify_internal_key)])
 async def get_recommendations(request: RecommendationRequest):
     """
     Embed project text, run pgvector similarity search, return ranked technologies/stacks

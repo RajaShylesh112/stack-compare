@@ -14,7 +14,6 @@ from schemas.github import (
     ReadRequest, ReadResponse
 )
 from middleware.internal_auth import verify_internal_key
-from middleware.user_auth import verify_user_token
 from lib.github_client import get_github_client
 
 router = APIRouter()
@@ -75,7 +74,7 @@ async def write_file(request: WriteRequest):
         raise HTTPException(status_code=500, detail="Failed to write file")
 
 
-@router.get("/read", response_model=ReadResponse, dependencies=[Depends(verify_user_token)])
+@router.get("/read", response_model=ReadResponse, dependencies=[Depends(verify_internal_key)])
 async def read_file(owner: str, repo: str, path: str):
     """Frontend-safe metadata fetch"""
     try:
